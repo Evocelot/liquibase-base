@@ -1,0 +1,19 @@
+services:
+  evocelot-modulebase-mariadb:
+    container_name: evocelot-modulebase-mariadb
+    image: library/mariadb:11.3.2
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: admin
+      TZ: Europe/Budapest
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--modulebase_initialized" ]
+      interval: 2s
+    volumes:
+      - ./schema_local_create.sql:/docker-entrypoint-initdb.d/schema_local_create.sql:ro
+networks:
+  default:
+    name: evocelot-network

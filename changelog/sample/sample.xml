@@ -1,0 +1,34 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet id="SAMPLE-CREATE_TABLE" author="mark.danisovszky">
+        <createTable tableName="SAMPLE">
+            <column name="X__ID" type="VARCHAR(30)" remarks="The primary key">
+                <constraints primaryKey="true" primaryKeyName="PK-SAMPLE-X__ID" nullable="false"/>
+            </column>
+
+            <column name="STATUS" type="VARCHAR(30)"/>
+            <column name="ENUM_VALUE" type="VARCHAR(30)"/>
+            <column name="INPUT_VALUE" type="VARCHAR(50)"/>
+            <column name="LOCAL_DATE" type="TIMESTAMP"/>
+            <column name="MOD_LOCAL_DATE" type="TIMESTAMP"/>
+
+            <column name="X__INSDATE" type="TIMESTAMP" remarks="Creation date" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="X__INSUSER" type="VARCHAR(30)" remarks="The create user" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="X__MODDATE" type="TIMESTAMP" remarks="Date of modification">
+                <constraints nullable="true"/>
+            </column>
+            <column name="X__MODUSER" type="VARCHAR(30)" remarks="The modifier user">
+                <constraints nullable="true"/>
+            </column>
+            <column name="X__VERSION" type="BIGINT" remarks="Version number" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>
