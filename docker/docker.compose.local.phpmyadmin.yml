@@ -1,0 +1,12 @@
+services:
+  phpmyadmin:
+    container_name: evocelot-phpmyadmin
+    image: phpmyadmin:5.2.1
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
+networks:
+  default:
+    name: evocelot-network
