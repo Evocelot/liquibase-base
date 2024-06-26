@@ -1,11 +1,16 @@
 = liquibase-base
 
-A foundational project for Liquibase-type applications.
+The Liquibase project for the module-base
+collects the changesets necessary to build
+the database schema of the module-base.
+
+Referenced project: link:https://github.com/Evocelot/module-base[module-base]
 
 == Technologies Used
 
 * mariadb:11.3.2
 * liquibase:mysql
+* docker and docker compose
 
 == Directory Structure
 
@@ -14,6 +19,7 @@ A foundational project for Liquibase-type applications.
 /docs <1>
 /docker <2>
 /changelog <3>
+
 ----
 <1> - The source of the project's documentation.
 <2> - Scripts used for running the project in a dockerized environment.
@@ -50,6 +56,14 @@ If needed, you can also start phpMyAdmin by running the following command:
 ----
 docker compose -f docker/docker.compose.local.phpmyadmin.yml up -d
 ----
+
+====
+The default user:
+
+- username: root
+- password: admin
+
+====
 
 == Documentation
 
