@@ -1,3 +1,6 @@
+include local.env
+export $(shell sed 's/=.*//' local.env)
+
 NETWORK_NAME=evocelot-network
 
 # Wrapper command to run a command and indent its output with a tab for better readability.
@@ -31,8 +34,6 @@ start-mariadb-container: create-podman-network stop-mariadb-container
       	-e TZ=Europe/Budapest \
       	-e LANG=C.UTF-8 \
       	-e LC_ALL=C.UTF-8 \
-		--health-cmd "healthcheck.sh --connect --initialized" \
-  		--health-interval 2s \
   		-v ./schema_local_create.sql:/docker-entrypoint-initdb.d/schema_local_create.sql:ro \
 		mariadb:11.6.2; \
 		\
@@ -43,6 +44,26 @@ stop-mariadb-container:
 	@echo "Stopping the evocelot-mariadb container"
 	$(call run-with-output-indent,\
 		podman rm -f evocelot-mariadb)
+
+# Builds the liquibase docker image.
+build-liquibase-image:
+	@echo "Building the liquibase docker image"
+	$(call run-with-output-indent,\
+		podman build -t $(IMAGE_NAME):$(VERSION) .)
+
+# Builds the image of the liquibase app and starts the container.
+start-liquibase-container: build-liquibase-image create-podman-network
+	@echo "Starting liquibase container"
+	$(call run-with-output-indent,\
+		podman run \
+		--network $(NETWORK_NAME) \
+		-e CONTEXTS=local \
+		-e DB_URL=jdbc:mariadb://evocelot-mariadb:3306/sample \
+		-e DB_USERNAME=root \
+		-e DB_PASSWORD=admin \
+		-e DB_DRIVER=org.mariadb.jdbc.Driver \
+		-v ./changelog:/liquibase/changelog \
+		$(IMAGE_NAME):$(VERSION))
 
 # Starts the local phpmyadmin container.
 start-phpmyadmin-container: stop-phpmyadmin-container
@@ -63,19 +84,3 @@ stop-phpmyadmin-container:
 	@echo "Stopping the evocelot-phpmyadmin container"
 	$(call run-with-output-indent,\
 		podman rm -f evocelot-phpmyadmin)
-
-# Starts the liquibase container (fire and forget).
-start-liquibase-container:
-	@echo "Starting liquibase container"
-	$(call run-with-output-indent,\
-		podman run \
-		--network $(NETWORK_NAME) \
-		-v ./changelog:/liquibase/changelog \
-		liquibase:4.30-alpine \
-		--contexts=local \
-		--url="jdbc:mariadb://evocelot-mariadb:3306/sample" \
-		--username=root \
-		--password=admin \
-		--changelog-file=/changelog/changelog.xml \
-		--driver=org.mariadb.jdbc.Driver \
-		update)
