@@ -4,29 +4,26 @@
 
     <changeSet id="SAMPLE-CREATE_TABLE" author="mark.danisovszky">
         <createTable tableName="SAMPLE">
-            <column name="X__ID" type="VARCHAR(30)" remarks="The primary key">
+            <column name="ID" type="VARCHAR(30)" remarks="The primary key">
                 <constraints primaryKey="true" primaryKeyName="PK-SAMPLE-X__ID" nullable="false"/>
             </column>
 
-            <column name="STATUS" type="VARCHAR(30)"/>
-            <column name="ENUM_VALUE" type="VARCHAR(30)"/>
-            <column name="INPUT_VALUE" type="VARCHAR(50)"/>
-            <column name="LOCAL_DATE" type="TIMESTAMP"/>
-            <column name="MOD_LOCAL_DATE" type="TIMESTAMP"/>
+            <column name="SAMPLE_VALUE" type="VARCHAR(30)"/>
+            <column name="SAMPLE_DATE" type="TIMESTAMP"/>
 
-            <column name="X__INSDATE" type="TIMESTAMP" remarks="Creation date" defaultValueComputed="CURRENT_TIMESTAMP">
+            <column name="INS_DATE" type="TIMESTAMP" remarks="Creation date" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
-            <column name="X__INSUSER" type="VARCHAR(30)" remarks="The create user" defaultValue="0">
+            <column name="INS_USER" type="VARCHAR(30)" remarks="The create user" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
-            <column name="X__MODDATE" type="TIMESTAMP" remarks="Date of modification">
+            <column name="MOD_DATE" type="TIMESTAMP" remarks="Date of modification">
                 <constraints nullable="true"/>
             </column>
-            <column name="X__MODUSER" type="VARCHAR(30)" remarks="The modifier user">
+            <column name="MOD_USER" type="VARCHAR(30)" remarks="The modifier user">
                 <constraints nullable="true"/>
             </column>
-            <column name="X__VERSION" type="BIGINT" remarks="Version number" defaultValue="0">
+            <column name="VERSION" type="BIGINT" remarks="Version number" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
         </createTable>
