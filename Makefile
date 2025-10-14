@@ -43,7 +43,7 @@ stop-mariadb-container:
 # Builds the liquibase docker image.
 build-liquibase-image:
 	@echo "[>>>] Building the liquibase docker image"
-	@podman build -t $(IMAGE_NAME):$(VERSION) .
+	@podman build -t $(IMAGE_NAME):$(VERSION) -f Dockerfile.prod
 	@echo "[<<<]"
 
 # Builds the image of the liquibase app and starts the container.
