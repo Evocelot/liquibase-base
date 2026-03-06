@@ -17,65 +17,69 @@ delete-podman-network:
 		echo "The network named $(NETWORK_NAME) cannot be deleted."
 	@echo "[<<<]"
 
-# Starts local mariadb container.
-start-mariadb-container: create-podman-network stop-mariadb-container
-	@echo "[>>>] Starting mariadb container"
-	@podman run -d \
-		--name evocelot-mariadb \
-		--network $(NETWORK_NAME) \
-		-p 3306:3306 \
-		-e MARIADB_ROOT_PASSWORD=admin \
-		-e TZ=Europe/Budapest \
-		-e LANG=C.UTF-8 \
-		-e LC_ALL=C.UTF-8 \
-		-v ./schema_local_create.sql:/docker-entrypoint-initdb.d/schema_local_create.sql:ro \
-		mariadb:11.6.2; \
-		\
-		echo "evocelot-mariadb started at: http://localhost:3306"
-	@echo "[<<<]"
-
-# Stops the local mariadb container.
-stop-mariadb-container:
-	@echo "[>>>] Stopping the evocelot-mariadb container"
-	@podman rm -f evocelot-mariadb
-	@echo "[<<<]"
-
 # Builds the liquibase docker image.
 build-liquibase-image:
 	@echo "[>>>] Building the liquibase docker image"
 	@podman build -t $(IMAGE_NAME):$(VERSION) -f Dockerfile.prod
 	@echo "[<<<]"
 
-# Builds the image of the liquibase app and starts the container.
+# Starts local postgresql container
+start-postgres-container: create-podman-network stop-postgres-container
+	mkdir -p evocelot-postgres-data
+	@echo "[>>>] Starting postgresql container"
+	@podman run -d \
+		--name evocelot-postgres \
+		--network $(NETWORK_NAME) \
+		-p 5432:5432 \
+		-e POSTGRES_DB=sample \
+		-e POSTGRES_USER=admin \
+		-e POSTGRES_PASSWORD=admin \
+		-e TZ=Europe/Budapest \
+		-v ./evocelot-postgres-data:/var/lib/postgresql/data \
+		postgres:16; \
+		\
+		echo "evocelot-postgres started at: localhost:5432"
+	@echo "[<<<]"
+
+# Stops the postgresql container.
+stop-postgres-container:
+	@echo "[>>>] Stopping the evocelot-postgres container"
+	@podman rm -f evocelot-postgres 2>/dev/null || true
+	@echo "[<<<]"
+
+# Starts the pgAdmin container.
+start-pgadmin-container: stop-pgadmin-container
+	@echo "[>>>] Starting pgAdmin container"
+	@podman run -d \
+		--name evocelot-pgadmin \
+		--network $(NETWORK_NAME) \
+		-p 5050:80 \
+		-e PGADMIN_DEFAULT_EMAIL=admin@evocelot.com \
+		-e PGADMIN_DEFAULT_PASSWORD=admin \
+		-e PGADMIN_CONFIG_SERVER_MODE=False \
+		-v ./pgadmin/servers.json:/pgadmin4/servers.json:ro \
+		--restart always \
+		dpage/pgadmin4:8; \
+		\
+		echo "pgAdmin started at: http://localhost:5050"
+	@echo "[<<<]"
+
+# Stops the pgAdmin container.
+stop-pgadmin-container:
+	@echo "[>>>] Stopping the evocelot-pgadmin container"
+	@podman rm -f evocelot-pgadmin 2>/dev/null || true
+	@echo "[<<<]"
+
+# Starts the liquibase container to run the database migrations.
 start-liquibase-container: build-liquibase-image create-podman-network
-	@echo "[>>>] Starting liquibase container"
+	@echo "[>>>] Starting liquibase container for postgres"
 	@podman run \
 		--network $(NETWORK_NAME) \
 		-e CONTEXTS=local \
-		-e DB_URL=jdbc:mariadb://evocelot-mariadb:3306/sample \
-		-e DB_USERNAME=root \
+		-e DB_URL=jdbc:postgresql://evocelot-postgres:5432/samplr \
+		-e DB_USERNAME=admin \
 		-e DB_PASSWORD=admin \
-		-e DB_DRIVER=org.mariadb.jdbc.Driver \
+		-e DB_DRIVER=org.postgresql.Driver \
 		-v ./changelog:/liquibase/changelog \
 		$(IMAGE_NAME):$(VERSION)
-	@echo "[<<<]"
-
-# Starts the local phpmyadmin container.
-start-phpmyadmin-container: stop-phpmyadmin-container
-	@echo "[>>>] Starting phpmyadmin container"
-	@podman run -d \
-		--name evocelot-phpmyadmin \
-		--network $(NETWORK_NAME) \
-		-p 8000:80 \
-		-e PMA_ARBITRARY=1 \
-		--restart always \
-		phpmyadmin:5.2.1; \
-		\
-		echo "evocelot-phpmyadmin started at: http://localhost:8000"
-	@echo "[<<<]"
-
-# Stops the local phpmyadmin container.
-stop-phpmyadmin-container:
-	@echo "[>>>] Stopping the evocelot-phpmyadmin container"
-	@podman rm -f evocelot-phpmyadmin
 	@echo "[<<<]"

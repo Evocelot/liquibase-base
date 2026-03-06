@@ -3,10 +3,10 @@ FROM liquibase:4.30-alpine
 
 # Set environment variables for Liquibase and database connection.
 ENV CONTEXTS=local
-ENV DB_URL=jdbc:mariadb://evocelot-mariadb:3306/sample
-ENV DB_USERNAME=root
+ENV DB_URL=jdbc:postgresql://evocelot-postgres:5432/sample
+ENV DB_USERNAME=admin
 ENV DB_PASSWORD=admin
-ENV DB_DRIVER=org.mariadb.jdbc.Driver
+ENV DB_DRIVER=org.postgresql.Driver
 
 # Create necessary directories.
 RUN mkdir -p /liquibase/changelog

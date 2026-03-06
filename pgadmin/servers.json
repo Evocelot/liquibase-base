@@ -1,0 +1,13 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "Evocelot Postgres",
+            "Group": "Servers",
+            "Host": "evocelot-postgres",
+            "Port": 5432,
+            "MaintenanceDB": "sample",
+            "Username": "admin",
+            "SSLMode": "prefer"
+        }
+    }
+}
